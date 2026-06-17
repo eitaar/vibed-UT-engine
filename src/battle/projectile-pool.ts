@@ -12,5 +12,6 @@ export class ProjectilePool {
 		this.pool = [];
 	}
 
-	// spawn(pos: Vec2, vel: Vec2, shape: ProjectileShape): Projectile): void {};
+	spawn(pos: Vec2, vel: Vec2, kind: ProjectileShape, rotation: number): void {}
+	update(dt: number) {}
 }

@@ -4,7 +4,6 @@ import type { Vec2 } from "../utils/vector";
 export interface Projectile {
 	pos: Vec2;
 	vel: Vec2;
-	radius: number;
 	gfx: Graphics;
 	alive: boolean;
 	age: number;
@@ -12,5 +11,5 @@ export interface Projectile {
 	rotation: number;
 }
 export type ProjectileShape =
-	| { shape: "circle"; radius: number }
-	| { shape: "rect"; width: number; height: number };
+	| { kind: "circle"; radius: number }
+	| { kind: "rect"; width: number; height: number };
