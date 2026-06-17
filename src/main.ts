@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
-import { keyboard } from "./utils/index";
-import { BattleScene } from "./scenes/battle-scene";
 import { SceneManager } from "./core/scene-manager";
+import { BattleScene } from "./scenes/battle-scene";
+import { keyboard } from "./utils/index";
 
 const canvas = document.getElementById("pixi-canvas") as HTMLCanvasElement;
 const app = new Application();

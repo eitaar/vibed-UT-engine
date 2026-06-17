@@ -50,3 +50,7 @@ export function rotate(v: Vec2, radians: number): Vec2 {
 export function lerp(a: Vec2, b: Vec2, t: number): Vec2 {
 	return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
 }
+
+export function topLeft(center: Vec2, width: number, height: number): Vec2 {
+	return { x: center.x - width / 2, y: center.y - height / 2 };
+}
