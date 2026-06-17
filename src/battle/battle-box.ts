@@ -11,7 +11,7 @@ function genBoxProp(
 	return { x: cord.x, y: cord.y, width: width, height: height };
 }
 
-const boxProp = genBoxProp(400, 490, 750, 320);
+const boxProp = genBoxProp(400, 550, 350, 350);
 
 export class BattleBox {
 	container: Graphics = new Graphics();
