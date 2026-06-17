@@ -1,8 +1,8 @@
 import { type Application, Container, Graphics, Text } from "pixi.js";
 import { BattleBox } from "../battle/battle-box";
+import { Player } from "../battle/player";
 import type { Scene } from "../core/scene";
 import type { SceneManager } from "../core/scene-manager";
-import { Player } from "../battle/player";
 
 const battleBox = new BattleBox();
 const player = new Player({
