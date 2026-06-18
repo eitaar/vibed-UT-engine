@@ -1,7 +1,8 @@
 import { Container, Graphics } from "pixi.js";
 import { clamp, lerp } from "../utils/easing";
 import type { Vec2 } from "../utils/vector";
-import type { Projectile, ProjectileShape } from "./projectile";
+import type { Motion, Projectile, ProjectileShape } from "./projectile";
+
 export class ProjectilePool {
 	container: Container;
 	projectiles: Projectile[];
@@ -15,20 +16,19 @@ export class ProjectilePool {
 
 	spawn(
 		startPos: Vec2,
-		endPos: Vec2,
-		kind: ProjectileShape,
-		rotation: number,
-		duration: number,
-		lingerTime?: number,
+		motions: Motion[],
+		shape: ProjectileShape,
+		rotation = 0,
+		lingerTime = 0,
 	): void {
 		const gfx: Graphics = this.pool.length > 0 ? this.pool.pop()! : new Graphics();
 		gfx.clear();
-		switch (kind.kind) {
+		switch (shape.kind) {
 			case "circle":
-				gfx.circle(0, 0, kind.radius);
+				gfx.circle(0, 0, shape.radius);
 				break;
 			case "rect":
-				gfx.rect(-kind.width / 2, -kind.height / 2, kind.width, kind.height);
+				gfx.rect(-shape.width / 2, -shape.height / 2, shape.width, shape.height);
 				break;
 		}
 		gfx.fill(0xffffff);
@@ -36,50 +36,22 @@ export class ProjectilePool {
 		gfx.x = startPos.x;
 		gfx.y = startPos.y;
 		gfx.rotation = rotation;
+		gfx.scale.set(1, 1);
 		gfx.visible = true;
 
 		const projectile: Projectile = {
-			pos: startPos,
+			pos: { x: startPos.x, y: startPos.y },
 			gfx,
 			alive: true,
-			age: 0,
-			shape: kind,
+			shape,
 			rotation,
-			duration,
-			startPos,
-			endPos,
+			motions,
+			motionIndex: 0,
+			motionAge: 0,
+			motionStartPos: { x: startPos.x, y: startPos.y },
+			motionStartScale: 1,
 			lingerTime,
-		};
-		this.projectiles.push(projectile);
-		this.container.addChild(gfx);
-	}
-	spawn_vel(pos: Vec2, vel: Vec2, kind: ProjectileShape, rotation: number, duration: number): void {
-		const gfx: Graphics = this.pool.length > 0 ? this.pool.pop()! : new Graphics();
-		gfx.clear();
-		switch (kind.kind) {
-			case "circle":
-				gfx.circle(0, 0, kind.radius);
-				break;
-			case "rect":
-				gfx.rect(-kind.width / 2, -kind.height / 2, kind.width, kind.height);
-				break;
-		}
-		gfx.fill(0xffffff);
-
-		gfx.x = pos.x;
-		gfx.y = pos.y;
-		gfx.rotation = rotation;
-		gfx.visible = true;
-
-		const projectile: Projectile = {
-			pos,
-			vel,
-			gfx,
-			alive: true,
-			age: 0,
-			shape: kind,
-			rotation,
-			duration,
+			done: false,
 		};
 
 		this.projectiles.push(projectile);
@@ -88,32 +60,59 @@ export class ProjectilePool {
 	update(dt: number) {
 		for (let i = this.projectiles.length - 1; i >= 0; i--) {
 			const p = this.projectiles[i];
-			p.age += dt;
-			if (p.vel) {
-				p.pos.x += p.vel.x * dt;
-				p.pos.y += p.vel.y * dt;
-			} else if (p.startPos && p.endPos) {
-				const t = clamp(p.age / p.duration, 0, 1);
-				const easedT = p.easing ? p.easing(t) : t;
-				p.pos.x = lerp(p.startPos.x, p.endPos.x, easedT);
-				p.pos.y = lerp(p.startPos.y, p.endPos.y, easedT);
-				const dx = p.endPos.x - p.pos.x;
-				const dy = p.endPos.y - p.pos.y;
-				if (dx * dx + dy * dy < 0.25) {
-					p.pos.x = p.endPos.x;
-					p.pos.y = p.endPos.y;
-					p.age = p.duration;
+
+			if (p.done) {
+				p.motionAge += dt;
+				if (p.motionAge >= p.lingerTime) {
+					this.kill(p);
+					this.projectiles.splice(i, 1);
+				}
+				continue;
+			}
+
+			const motion = p.motions[p.motionIndex];
+			p.motionAge += dt;
+
+			switch (motion.type) {
+				case "lerp": {
+					const t = clamp(p.motionAge / motion.duration, 0, 1);
+					const easedT = motion.easing ? motion.easing(t) : t;
+					p.pos.x = lerp(p.motionStartPos.x, motion.endPos.x, easedT);
+					p.pos.y = lerp(p.motionStartPos.y, motion.endPos.y, easedT);
+					break;
+				}
+				case "vel":
+					p.pos.x += motion.vel.x * dt;
+					p.pos.y += motion.vel.y * dt;
+					break;
+				case "wait":
+					break;
+			}
+
+			if (motion.rotationSpeed) {
+				p.gfx.rotation += motion.rotationSpeed * dt;
+			}
+			if (motion.scaleTo !== undefined) {
+				const st = clamp(p.motionAge / motion.duration, 0, 1);
+				const s = lerp(p.motionStartScale, motion.scaleTo, st);
+				p.gfx.scale.set(s, s);
+			}
+
+			if (p.motionAge >= motion.duration) {
+				p.motionStartPos = { x: p.pos.x, y: p.pos.y };
+				p.motionStartScale = p.gfx.scale.x;
+				p.motionIndex++;
+				p.motionAge = 0;
+				if (p.motionIndex >= p.motions.length) {
+					p.done = true;
+					p.motionAge = 0;
 				}
 			}
+
 			p.gfx.x = p.pos.x;
 			p.gfx.y = p.pos.y;
-			if (
-				p.pos.x < 0 ||
-				p.pos.x > 800 ||
-				p.pos.y < 0 ||
-				p.pos.y > 800 ||
-				p.age >= p.duration + (p.lingerTime ?? 0)
-			) {
+
+			if (p.pos.x < -100 || p.pos.x > 900 || p.pos.y < -100 || p.pos.y > 900) {
 				this.kill(p);
 				this.projectiles.splice(i, 1);
 			}
