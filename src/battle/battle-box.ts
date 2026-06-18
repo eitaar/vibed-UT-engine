@@ -1,38 +1,35 @@
 import { Graphics } from "pixi.js";
-import { topLeft } from "../utils/vector";
-
-function genBoxProp(
-	x: number,
-	y: number,
-	width: number,
-	height: number,
-): { x: number; y: number; width: number; height: number } {
-	const cord = topLeft({ x: x, y: y }, width, height);
-	return { x: cord.x, y: cord.y, width: width, height: height };
-}
-
-const boxProp = genBoxProp(400, 550, 350, 350);
+import { vec, easing } from "../utils/index";
+import type { Vec2 } from "../utils/vector";
 
 export class BattleBox {
 	container: Graphics = new Graphics();
-	x: number = boxProp.x;
-	y: number = boxProp.y;
-	width: number = boxProp.width;
-	height: number = boxProp.height;
+	centerX: number = 400;
+	centerY: number = 550;
+	width: number = 350;
+	height: number = 350;
 	strokeWidth: number = 6;
+
 	constructor() {
+		this.container.position.set(this.centerX, this.centerY);
 		this.draw();
 	}
+
 	draw(): void {
-		this.container.rect(this.x, this.y, this.width, this.height);
+		this.container.clear();
+		this.container.rect(-this.width / 2, -this.height / 2, this.width, this.height);
 		this.container.stroke({ width: this.strokeWidth, color: 0xffffff });
 	}
-	getInnerBounds(): { left: number; top: number; right: number; bottom: number } {
-		return {
-			left: this.x + this.strokeWidth,
-			top: this.y + this.strokeWidth,
-			right: this.x + this.width - this.strokeWidth,
-			bottom: this.y + this.height - this.strokeWidth,
+
+	constrainPoint(worldPoint: Vec2, radius: number): Vec2 {
+		const center = { x: this.centerX, y: this.centerY };
+		const rotation = this.container.rotation;
+		const local = vec.rotate(vec.sub(worldPoint, center), -rotation);
+		const sw = this.strokeWidth;
+		const clamped = {
+			x: easing.clamp(local.x, -this.width / 2 + sw + radius, this.width / 2 - sw - radius),
+			y: easing.clamp(local.y, -this.height / 2 + sw + radius, this.height / 2 - sw - radius),
 		};
+		return vec.add(vec.rotate(clamped, rotation), center);
 	}
 }
