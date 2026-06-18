@@ -1,9 +1,10 @@
 import { type Application, Container } from "pixi.js";
 import { BattleBox } from "../battle/battle-box";
 import { Player } from "../battle/player";
+import { ProjectilePool } from "../battle/projectile-pool";
 import type { Scene } from "../core/scene";
 import type { SceneManager } from "../core/scene-manager";
-import { ProjectilePool } from "../battle/projectile-pool";
+import { delay } from "../utils/delay";
 
 const battleBox = new BattleBox();
 const projectilePool = new ProjectilePool();
@@ -15,7 +16,15 @@ export class BattleScene implements Scene {
 		this.container.addChild(battleBox.container);
 		this.container.addChild(player.gfx);
 
-		projectilePool.spawn({ x: 100, y: 100 }, { x: 1, y: 1 }, { kind: "circle", radius: 10 }, 0);
+		await delay(1000);
+		projectilePool.spawn(
+			{ x: 100, y: 100 },
+			{ x: 700, y: 700 },
+			{ kind: "circle", radius: 10 },
+			0,
+			60,
+			0,
+		);
 
 		this.container.addChild(projectilePool.container);
 	}

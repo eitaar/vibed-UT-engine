@@ -1,5 +1,5 @@
 import { Graphics } from "pixi.js";
-import { vec, easing } from "../utils/index";
+import { easing, vec } from "../utils/index";
 import type { Vec2 } from "../utils/vector";
 
 export class BattleBox {
