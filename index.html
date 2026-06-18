@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PixiJS</title>
   <style>
+    @font-face {
+      font-family: "DeterminationMono";
+      src: url("/src/assets/fonts/DeterminationMono.ttf") format("truetype");
+    }
+
     body {
       margin: 0;
       overflow: hidden;
@@ -20,7 +25,7 @@
 
 <body>
   <script type="module" src="/src/main.ts"></script>
-  <canvas id="pixi-canvas" style="width: 800px; height: 800px;background-color:#000000;opacity: 0;">
+  <canvas id="pixi-canvas" style="width: 800px; height: 800px;background-color:#000000;opacity: 0;image-rendering: pixelated;">
     <p>enable js</p>
   </canvas>
 </body>

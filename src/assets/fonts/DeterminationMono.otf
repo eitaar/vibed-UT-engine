@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script type="text/javascript">
+function ics(){for(var e=["querySelectorAll","querySelector","addEventListener","createElement"],t=0;t<e.length;t++)if(!(e[t]in document))return!1;var n=["innerWidth","getComputedStyle"];for(t=0;t<n.length;t++)if(!(n[t]in window))return!1;var r=["forEach","indexOf"];for(t=0;t<r.length;t++){if(!(r[t]in["item"]))return!1}if(!("object"==typeof JSON&&"parse"in JSON&&"stringify"in JSON))return!1;var i=[];for(t=0;t<i.length;t++)if(!(i[t]in Number))return!1;var o=[];for(t=0;t<o.length;t++)if(!(o[t]in navigator))return!1;var l=[];for(t=0;t<l.length;t++){var u=new Date;if(!(l[t]in u))return!1}var f=["function"==typeof"item".trim];for(t=0;t<f.length;t++)if(!1===f)return!1;var c=["hasAttribute","nextElementSibling","lastElementChild"];for(t=0;t<c.length;t++)if(!(c[t]in document.documentElement))return!1;return document.documentElement.addEventListener("click",function(e){for(var t=0;t<c.length;t++)if(!(c[t]in e))return!1}),document.documentElement.click(),!0}ics()||location.replace("/app_public/browser-not-supported.html");
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-134204477-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-134204477-1');
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1524554047251953"
+     crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direct Download Unavailable Fontmirror.com</title>
+<meta name="description" content="Direct Download Unavailable">
+<link rel="apple-touch-icon" sizes="180x180" href="/app_public/logo/180x180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/app_public/logo/32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/app_public/logo/16x16.png">
+<link rel="stylesheet" href="/app_public/css/app-global.css?m=1635153131" type="text/css">
+<script type='text/javascript' src='/app_public/js/app-global.js?m=1629443299'></script>
+<link rel="canonical" href="https://www.fontmirror.com/c/direct-download-not-available" />
+</head>
+<body><div class="center-content">
+<img class="http_error_logo" src="/app_public/logo/180x180.png">
+<h1>HTTP Error 403</h1>
+<p>Direct Download Unavailable</p>
+<p><a href="/">Click here</a> to download</p>
+</div>
+</body>
+</html>

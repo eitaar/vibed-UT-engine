@@ -8,6 +8,12 @@ export class Player {
 	speed = 4;
 	slowSpeed = 2.5;
 	radius = 7;
+	hp = 20;
+	maxHp = 20;
+	invincible = false;
+	invincibleTimer = 0;
+	invincibleDuration = 40;
+	age = 0;
 
 	constructor(pos: Vec2) {
 		this.pos = { ...pos };
@@ -25,7 +31,28 @@ export class Player {
 		this.gfx.y = this.pos.y;
 	}
 
+	hit(damage = 1): void {
+		if (this.invincible) return;
+		this.hp = Math.max(0, this.hp - damage);
+		this.invincible = true;
+		this.invincibleTimer = this.invincibleDuration;
+	}
+
 	update(dt: number, constrain: (pos: Vec2, radius: number) => Vec2): void {
+		this.age += dt;
+
+		if (this.invincible) {
+			this.invincibleTimer -= dt;
+			if (this.invincibleTimer <= 0) {
+				this.invincible = false;
+				this.gfx.alpha = 1;
+			} else {
+				const fade = this.invincibleTimer / this.invincibleDuration;
+				const wave = (Math.sin(this.age * 0.6) + 1) / 2;
+				this.gfx.alpha = 0.2 + wave * 0.5 * (1 - fade) + fade * 0.3;
+			}
+		}
+
 		const dir = keyboard.getDirection();
 		const speed = keyboard.isDown("Shift") ? this.slowSpeed : this.speed;
 		const norm = vec.normalize(dir);
