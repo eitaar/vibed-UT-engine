@@ -6,7 +6,6 @@ export interface Projectile {
 	gfx: Graphics;
 	alive: boolean;
 	shape: ProjectileShape;
-	rotation: number;
 	motions: Motion[];
 	motionIndex: number;
 	motionAge: number;

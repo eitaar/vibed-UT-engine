@@ -16,7 +16,10 @@ export class HpBar {
 		this.width = width;
 		this.height = height;
 
-		this.label = new Text({ text: "HP", style: { fontSize: 18, fill: 0xffffff, fontFamily: "DeterminationMono" } });
+		this.label = new Text({
+			text: "HP",
+			style: { fontSize: 18, fill: 0xffffff, fontFamily: "DeterminationMono" },
+		});
 		this.label.x = -40;
 		this.label.y = -2;
 
@@ -30,10 +33,10 @@ export class HpBar {
 		this.bg.fill(0x333333);
 	}
 
-	update(hp: number, maxHp: number): void {
+	update(hp: number, maxHp: number, dt: number): void {
 		const targetRatio = Math.max(0, hp / maxHp);
-		this.displayRatio = lerp(this.displayRatio, targetRatio, 0.15);
-		this.trailRatio = lerp(this.trailRatio, targetRatio, 0.04);
+		this.displayRatio = lerp(this.displayRatio, targetRatio, 0.15 * dt);
+		this.trailRatio = lerp(this.trailRatio, targetRatio, 0.04 * dt);
 
 		this.trailBar.clear();
 		this.trailBar.rect(0, 0, this.width * this.trailRatio, this.height);

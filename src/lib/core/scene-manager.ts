@@ -42,7 +42,6 @@ export class SceneManager {
 	update(dt: number): void {
 		if (this.fadeState === "out") {
 			this.overlay.alpha += this.fadeSpeed * dt;
-			this.app.stage.addChild(this.overlay);
 			if (this.overlay.alpha >= 1) {
 				this.overlay.alpha = 1;
 				this.swapScene();
@@ -52,7 +51,6 @@ export class SceneManager {
 
 		if (this.fadeState === "in") {
 			this.overlay.alpha -= this.fadeSpeed * dt;
-			this.app.stage.addChild(this.overlay);
 			if (this.overlay.alpha <= 0) {
 				this.overlay.alpha = 0;
 				this.overlay.visible = false;

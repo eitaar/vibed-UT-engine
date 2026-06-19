@@ -1,12 +1,19 @@
 import { Application } from "pixi.js";
-import { SceneManager } from "./core/scene-manager";
-import { TitleScene } from "./scenes/title-scene";
-import { keyboard } from "./utils/index";
+import { TitleScene } from "./game/scenes/title-scene";
+import { SceneManager } from "./lib/core/scene-manager";
+import { keyboard } from "./lib/utils/index";
 
 const canvas = document.getElementById("pixi-canvas") as HTMLCanvasElement;
 const app = new Application();
 
-await app.init({ background: "#000000", canvas: canvas, width: 800, height: 800, roundPixels: true, antialias: false });
+await app.init({
+	background: "#000000",
+	canvas: canvas,
+	width: 800,
+	height: 800,
+	roundPixels: true,
+	antialias: false,
+});
 await document.fonts.load('24px "DeterminationMono"');
 canvas.style.opacity = "1";
 

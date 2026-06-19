@@ -1,5 +1,5 @@
 import { Text } from "pixi.js";
-import { keyboard } from "../utils/index";
+import { isJustPressed } from "../utils/keyboard";
 import type { BattleBox } from "./battle-box";
 
 export class Dialog {
@@ -62,11 +62,11 @@ export class Dialog {
 				this.text.text = currentLine.slice(0, this.charIndex);
 			}
 
-			if (keyboard.isJustPressed("z")) {
+			if (isJustPressed("z")) {
 				this.charIndex = currentLine.length;
 				this.text.text = currentLine;
 			}
-		} else if (keyboard.isJustPressed("z")) {
+		} else if (isJustPressed("z")) {
 			this.lineIndex++;
 			if (this.lineIndex >= this.lines.length) {
 				this.active = false;

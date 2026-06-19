@@ -44,7 +44,6 @@ export class ProjectilePool {
 			gfx,
 			alive: true,
 			shape,
-			rotation,
 			motions,
 			motionIndex: 0,
 			motionAge: 0,

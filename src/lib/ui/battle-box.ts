@@ -1,37 +1,33 @@
 import { Graphics } from "pixi.js";
-import { easing, vec } from "../utils/index";
-import { lerp } from "../utils/easing";
+import { clamp, lerp } from "../utils/easing";
+import { add, rotate, sub } from "../utils/vector";
 import type { Vec2 } from "../utils/vector";
 
-interface BoxConfig {
+export interface BoxConfig {
 	centerX: number;
 	centerY: number;
 	width: number;
 	height: number;
 }
 
-export const BOX_DIALOG: BoxConfig = { centerX: 400, centerY: 530, width: 550, height: 150 };
-export const BOX_BATTLE: BoxConfig = { centerX: 400, centerY: 550, width: 350, height: 350 };
-
 export class BattleBox {
 	container: Graphics = new Graphics();
-	centerX = BOX_BATTLE.centerX;
-	centerY = BOX_BATTLE.centerY;
-	width = BOX_BATTLE.width;
-	height = BOX_BATTLE.height;
+	centerX!: number;
+	centerY!: number;
+	width!: number;
+	height!: number;
 	strokeWidth = 6;
 
-	private targetCenterX = this.centerX;
-	private targetCenterY = this.centerY;
-	private targetWidth = this.width;
-	private targetHeight = this.height;
+	private targetCenterX!: number;
+	private targetCenterY!: number;
+	private targetWidth!: number;
+	private targetHeight!: number;
 	private transitioning = false;
 	private lerpSpeed = 0.08;
 	private onTransitionDone: (() => void) | null = null;
 
-	constructor() {
-		this.container.position.set(this.centerX, this.centerY);
-		this.draw();
+	constructor(config: BoxConfig) {
+		this.setConfig(config);
 	}
 
 	setConfig(config: BoxConfig): void {
@@ -65,9 +61,6 @@ export class BattleBox {
 		this.width = lerp(this.width, this.targetWidth, speed);
 		this.height = lerp(this.height, this.targetHeight, speed);
 
-		this.container.position.set(this.centerX, this.centerY);
-		this.draw();
-
 		const dx = Math.abs(this.centerX - this.targetCenterX);
 		const dy = Math.abs(this.centerY - this.targetCenterY);
 		const dw = Math.abs(this.width - this.targetWidth);
@@ -77,9 +70,13 @@ export class BattleBox {
 			this.centerY = this.targetCenterY;
 			this.width = this.targetWidth;
 			this.height = this.targetHeight;
-			this.container.position.set(this.centerX, this.centerY);
-			this.draw();
 			this.transitioning = false;
+		}
+
+		this.container.position.set(this.centerX, this.centerY);
+		this.draw();
+
+		if (!this.transitioning) {
 			this.onTransitionDone?.();
 			this.onTransitionDone = null;
 		}
@@ -94,12 +91,12 @@ export class BattleBox {
 	constrainPoint(worldPoint: Vec2, radius: number): Vec2 {
 		const center = { x: this.centerX, y: this.centerY };
 		const rotation = this.container.rotation;
-		const local = vec.rotate(vec.sub(worldPoint, center), -rotation);
+		const local = rotate(sub(worldPoint, center), -rotation);
 		const sw = this.strokeWidth;
 		const clamped = {
-			x: easing.clamp(local.x, -this.width / 2 + sw + radius, this.width / 2 - sw - radius),
-			y: easing.clamp(local.y, -this.height / 2 + sw + radius, this.height / 2 - sw - radius),
+			x: clamp(local.x, -this.width / 2 + sw + radius, this.width / 2 - sw - radius),
+			y: clamp(local.y, -this.height / 2 + sw + radius, this.height / 2 - sw - radius),
 		};
-		return vec.add(vec.rotate(clamped, rotation), center);
+		return add(rotate(clamped, rotation), center);
 	}
 }

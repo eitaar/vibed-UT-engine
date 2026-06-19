@@ -1,7 +1,7 @@
 import { type Application, Container, Text } from "pixi.js";
-import type { Scene } from "../core/scene";
-import type { SceneManager } from "../core/scene-manager";
-import { keyboard } from "../utils/index";
+import type { Scene } from "../../lib/core/scene";
+import type { SceneManager } from "../../lib/core/scene-manager";
+import { keyboard } from "../../lib/utils/index";
 import { BattleScene } from "./battle-scene";
 
 export class TitleScene implements Scene {
