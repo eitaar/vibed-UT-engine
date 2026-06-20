@@ -1,7 +1,7 @@
 import { Graphics } from "pixi.js";
-import { getDirection, isDown, isJustPressed } from "../utils/keyboard";
-import { normalize } from "../utils/vector";
+import { getDirection, isDown } from "../utils/keyboard";
 import type { Vec2 } from "../utils/vector";
+import { normalize } from "../utils/vector";
 import { Health } from "./health";
 
 export type SoulMode = "red" | "blue";
@@ -68,6 +68,8 @@ export class SoulPlayer {
 	private maxFallSpeed: number;
 	private slamActive = false;
 	private slamSpeed = 0;
+	private slamLockoutTime = 0;
+	private slamLockout = 0;
 	private grounded = false;
 	private drawFn: (gfx: Graphics, color: number) => void;
 
@@ -118,12 +120,14 @@ export class SoulPlayer {
 		this.gfx.rotation = GRAVITY_ROTATIONS[dir];
 	}
 
-	slam(dir: GravityDirection, duration = 12): void {
+	slam(dir: GravityDirection, duration = 12, lockout = 0): void {
 		this.setGravityDirection(dir);
 		this.setSoulMode("blue");
 		const cfg = GRAVITY_CONFIG[dir];
 		this.slamSpeed = (500 / duration) * cfg.sign;
 		this.slamActive = true;
+		this.slamLockoutTime = lockout;
+		this.slamLockout = 0;
 		this.grounded = false;
 		this.velocity = 0;
 	}
@@ -140,20 +144,31 @@ export class SoulPlayer {
 			this.pos.y += norm.y * speed * dt;
 		} else {
 			const cfg = GRAVITY_CONFIG[this.gravityDir];
-			const speed = isDown("Shift") ? this.slowSpeed : this.speed;
 
-			const moveAxis = cfg.axis === "y" ? "x" : "y";
-			if (isDown(cfg.moveNeg)) this.pos[moveAxis] -= speed * dt;
-			if (isDown(cfg.movePos)) this.pos[moveAxis] += speed * dt;
+			if (this.slamLockout > 0) {
+				this.slamLockout -= dt;
+				if (this.slamLockout <= 0) {
+					this.slamLockout = 0;
+					if (this.grounded && isDown(cfg.jumpKey)) {
+						this.velocity = -this.jumpForce * cfg.sign;
+						this.grounded = false;
+					}
+				}
+			} else {
+				const speed = isDown("Shift") ? this.slowSpeed : this.speed;
+				const moveAxis = cfg.axis === "y" ? "x" : "y";
+				if (isDown(cfg.moveNeg)) this.pos[moveAxis] -= speed * dt;
+				if (isDown(cfg.movePos)) this.pos[moveAxis] += speed * dt;
 
-			if (this.grounded && isJustPressed(cfg.jumpKey)) {
-				this.velocity = -this.jumpForce * cfg.sign;
-				this.grounded = false;
+				if (this.grounded && isDown(cfg.jumpKey)) {
+					this.velocity = -this.jumpForce * cfg.sign;
+					this.grounded = false;
+				}
 			}
 
 			if (this.slamActive) {
 				this.pos[cfg.axis] += this.slamSpeed * dt;
-			} else {
+			} else if (this.slamLockout <= 0) {
 				if (this.velocity * cfg.sign < 0 && !isDown(cfg.jumpKey)) {
 					this.velocity += this.gravityForce * cfg.sign * 2.5 * dt;
 				} else {
@@ -178,6 +193,7 @@ export class SoulPlayer {
 			if (curr !== prev) {
 				if (this.slamActive) {
 					this.slamActive = false;
+					this.slamLockout = this.slamLockoutTime;
 					this.onSlamLand?.();
 				}
 				this.velocity = 0;

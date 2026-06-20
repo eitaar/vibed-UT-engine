@@ -3,8 +3,8 @@ import { ScreenShake } from "../effects/screen-shake";
 import { Enemy } from "../entity/enemy";
 import { SoulPlayer, type SoulPlayerConfig } from "../entity/soul-player";
 import { Blaster, type BlasterConfig } from "../projectile/blaster";
-import type { Motion, ProjectileShape } from "../projectile/projectile";
 import { checkCollisions } from "../projectile/collision";
+import type { Motion, ProjectileShape } from "../projectile/projectile";
 import { ProjectilePool } from "../projectile/projectile-pool";
 import { BattleBox, type BoxConfig } from "../ui/battle-box";
 import { Dialog } from "../ui/dialog";
@@ -14,6 +14,12 @@ import type { Vec2 } from "../utils/vector";
 export type BattleState = "idle" | "dialog" | "transition" | "fighting" | "dead";
 
 export type BulletPattern = (e: BattleEngine) => void;
+
+export interface AttackAPI {
+	pattern(pattern: BulletPattern): void;
+	spawn(config: SpawnConfig): void;
+	blast(config: BlasterConfig): void;
+}
 
 export interface SpawnConfig {
 	x: number;
@@ -47,7 +53,8 @@ export interface BattleConfig {
 export class BattleEngine {
 	container = new Container();
 	box: BattleBox;
-	pool = new ProjectilePool();
+	attack!: AttackAPI;
+	private pool = new ProjectilePool();
 	hpBar: HpBar;
 	dialog: Dialog;
 	shake: ScreenShake;
@@ -80,6 +87,41 @@ export class BattleEngine {
 		this.dialog = new Dialog(this.box);
 		this.shake = new ScreenShake(this.container);
 
+		this.attack = {
+			pattern: (pattern: BulletPattern) => {
+				pattern(this);
+				this.wave++;
+			},
+			spawn: (config: SpawnConfig) => {
+				this.pool.spawn(
+					{ x: config.x, y: config.y },
+					config.motions,
+					config.shape ?? { kind: "rect", width: 8, height: 45 },
+					config.rotation ?? 0,
+					config.linger ?? 0,
+				);
+			},
+			blast: (config: BlasterConfig) => {
+				let angle = config.angle ?? 0;
+				if (config.aimAtPlayer) {
+					angle = Math.atan2(this.player.pos.y - config.y, this.player.pos.x - config.x);
+				}
+				const b = new Blaster(
+					config.x,
+					config.y,
+					angle,
+					config.chargeTime ?? 30,
+					config.duration ?? 40,
+					config.width ?? 30,
+					config.length ?? 1000,
+					config.enterFrom ?? "back",
+					() => this.shake.trigger(10, 12),
+				);
+				this.blasters.push(b);
+				this.container.addChild(b.container);
+			},
+		};
+
 		this.container.addChild(
 			this.box.container,
 			this.pool.container,
@@ -104,46 +146,11 @@ export class BattleEngine {
 		}
 	}
 
-	attack(pattern: BulletPattern): void {
-		pattern(this);
-		this.wave++;
-	}
-
-	spawn(config: SpawnConfig): void {
-		this.pool.spawn(
-			{ x: config.x, y: config.y },
-			config.motions,
-			config.shape ?? { kind: "rect", width: 8, height: 45 },
-			config.rotation ?? 0,
-			config.linger ?? 0,
-		);
-	}
-
 	wait(frames: number): Promise<void> {
 		return new Promise((resolve) => {
 			this.waitTimer = frames;
 			this.resolveWait = resolve;
 		});
-	}
-
-	blast(config: BlasterConfig): void {
-		let angle = config.angle ?? 0;
-		if (config.aimAtPlayer) {
-			angle = Math.atan2(this.player.pos.y - config.y, this.player.pos.x - config.x);
-		}
-		const b = new Blaster(
-			config.x,
-			config.y,
-			angle,
-			config.chargeTime ?? 30,
-			config.duration ?? 40,
-			config.width ?? 30,
-			config.length ?? 1000,
-			config.enterFrom ?? "back",
-			() => this.shake.trigger(10, 12),
-		);
-		this.blasters.push(b);
-		this.container.addChild(b.container);
 	}
 
 	private transitionToFight(): void {

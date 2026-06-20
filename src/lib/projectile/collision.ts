@@ -1,5 +1,5 @@
-import { rotate, sub } from "../utils/vector";
 import type { Vec2 } from "../utils/vector";
+import { rotate, sub } from "../utils/vector";
 import type { Projectile } from "./projectile";
 
 function circleVsCircle(aPos: Vec2, aRadius: number, bPos: Vec2, bRadius: number): boolean {

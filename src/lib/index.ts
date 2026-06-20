@@ -15,6 +15,7 @@ export * from "./ui/hp-bar";
 export * from "./utils/delay";
 export {
 	clamp,
+	linear,
 	easeInCubic,
 	easeInOutCubic,
 	easeInOutQuad,

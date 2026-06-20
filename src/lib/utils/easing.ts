@@ -6,6 +6,10 @@ export function clamp(value: number, min: number, max: number): number {
 	return Math.max(min, Math.min(max, value));
 }
 
+export function linear(t: number): number {
+	return t;
+}
+
 export function easeInQuad(t: number): number {
 	return t * t;
 }

@@ -150,21 +150,31 @@ export class Blaster {
 
 		// upper jaw
 		this.emitter.poly([
-			-s * 1.6, -s * 1.2,
-			-s * 0.3, -s * 1.2,
-			s * 0.6, -mouthGap,
-			-s * 0.3, -mouthGap,
-			-s * 1.6, -s * 0.4,
+			-s * 1.6,
+			-s * 1.2,
+			-s * 0.3,
+			-s * 1.2,
+			s * 0.6,
+			-mouthGap,
+			-s * 0.3,
+			-mouthGap,
+			-s * 1.6,
+			-s * 0.4,
 		]);
 		this.emitter.fill({ color: 0xffffff, alpha });
 
 		// lower jaw
 		this.emitter.poly([
-			-s * 1.6, s * 0.4,
-			-s * 0.3, mouthGap,
-			s * 0.6, mouthGap,
-			-s * 0.3, s * 1.2,
-			-s * 1.6, s * 1.2,
+			-s * 1.6,
+			s * 0.4,
+			-s * 0.3,
+			mouthGap,
+			s * 0.6,
+			mouthGap,
+			-s * 0.3,
+			s * 1.2,
+			-s * 1.6,
+			s * 1.2,
 		]);
 		this.emitter.fill({ color: 0xffffff, alpha });
 	}

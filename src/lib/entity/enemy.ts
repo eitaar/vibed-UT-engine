@@ -8,12 +8,7 @@ export class Enemy {
 	private baseY: number;
 	private age = 0;
 
-	constructor(
-		name: string,
-		dialogueLines: string[],
-		x: number,
-		y: number,
-	) {
+	constructor(name: string, dialogueLines: string[], x: number, y: number) {
 		this.name = name;
 		this.dialogueLines = dialogueLines;
 		this.container.position.set(x, y);
